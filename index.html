@@ -694,11 +694,9 @@
                 if (buyerHouseType !== 'residential') {
                     incomeCalcInfo.innerHTML = '⚠️ <strong>商业房/其他类型不能适用核定征收</strong>，需提供原购凭证按差额计算';
                     incomeCalcInfo.style.background = '#fff3cd';
-                    incomeCalcInfo.style.borderColor = '#ffc107';
                 } else {
                     incomeCalcInfo.innerHTML = '💡 核定征收：按成交价×<strong>2%</strong>计算';
                     incomeCalcInfo.style.background = 'rgba(0, 0, 0, 0.05)';
-                    incomeCalcInfo.style.borderColor = 'transparent';
                 }
                 incomeCalcInfo.style.display = 'block';
             }
