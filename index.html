@@ -502,8 +502,8 @@
                         <label for="buyerHouseType">房屋类型</label>
                         <select id="buyerHouseType" name="buyerHouseType">
                             <option value="residential">普通住宅</option>
-                            <option value="commercial">商业房</option>
-                            <option value="other">其他</option>
+                            <option value="commercial">商业房（商铺、写字楼等）</option>
+                            <option value="other">其他（车位、储藏室等非住宅）</option>
                         </select>
                     </div>
                 </div>
@@ -553,8 +553,11 @@
                             </div>
                             <div class="radio-item">
                                 <input type="radio" id="incomeTotal" name="incomeCalc" value="total">
-                                <label for="incomeTotal">不能提供凭证</label>
+                                <label for="incomeTotal">不能提供凭证（核定征收）</label>
                             </div>
+                        </div>
+                        <div class="info-box" id="incomeCalcInfo">
+                            💡 核定征收：按成交价×<strong>2%</strong>计算（仅限普通住宅）
                         </div>
                     </div>
 
@@ -662,11 +665,33 @@
         function toggleIncomeCalc() {
             const incomeCalc = document.querySelector('input[name="incomeCalc"]:checked').value;
             const originalPriceGroup = document.getElementById('originalPriceGroup');
+            const incomeCalcInfo = document.getElementById('incomeCalcInfo');
+            const buyerHouseType = document.getElementById('buyerHouseType').value;
             
             if (incomeCalc === 'diff') {
                 originalPriceGroup.style.display = 'block';
+                incomeCalcInfo.style.display = 'none';
             } else {
                 originalPriceGroup.style.display = 'none';
+                // 商业房不能核定征收
+                if (buyerHouseType !== 'residential') {
+                    incomeCalcInfo.innerHTML = '⚠️ <strong>商业房/其他类型不能适用核定征收</strong>，需提供原购凭证按差额计算';
+                    incomeCalcInfo.style.background = '#fff3cd';
+                    incomeCalcInfo.style.borderColor = '#ffc107';
+                } else {
+                    incomeCalcInfo.innerHTML = '💡 核定征收：按成交价×<strong>2%</strong>计算';
+                    incomeCalcInfo.style.background = 'rgba(0, 0, 0, 0.05)';
+                    incomeCalcInfo.style.borderColor = 'transparent';
+                }
+                incomeCalcInfo.style.display = 'block';
+            }
+        }
+
+        // 房屋类型变化时也要更新提示
+        function onHouseTypeChange() {
+            const incomeCalc = document.querySelector('input[name="incomeCalc"]:checked').value;
+            if (incomeCalc === 'total') {
+                toggleIncomeCalc();
             }
         }
 
@@ -676,6 +701,7 @@
             radios.forEach(radio => {
                 radio.addEventListener('change', toggleIncomeCalc);
             });
+            document.getElementById('buyerHouseType').addEventListener('change', onHouseTypeChange);
             toggleIncomeCalc();
         });
 
@@ -737,10 +763,28 @@
             }
 
             // 个人所得税
+            const buyerHouseType = document.getElementById('buyerHouseType').value;
+            
             if (ownership === 'over5' && unique === 'yes') {
                 incomeTax = 0;
                 incomeCalcMethod = '满5年唯一住房免征个人所得税';
-                sellerExemption += price * 10000 * 0.01; // 满5年唯一住房免征个税
+                sellerExemption += price * 10000 * 0.02; // 满5年唯一住房免征个税
+            } else if (incomeCalc === 'total' && buyerHouseType !== 'residential') {
+                // 商业房/其他类型不能核定征收，强制按差额计算
+                if (originalPrice > 0) {
+                    const diff = (price - originalPrice) * 10000;
+                    if (diff > 0) {
+                        incomeTax = diff * 0.2;
+                        incomeCalcMethod = '商业房/其他类型不能核定征收，按差额（' + diff.toFixed(2) + '元）×20%计算';
+                    } else {
+                        incomeTax = 0;
+                        incomeCalcMethod = '商业房/其他类型不能核定征收，无增值差额为0';
+                    }
+                } else {
+                    // 商业房但没有原购凭证，按全额20%征收
+                    incomeTax = price * 10000 * 0.2;
+                    incomeCalcMethod = '⚠️ 商业房/其他类型不能核定征收，未提供原购凭证按全额×20%计算';
+                }
             } else if (incomeCalc === 'diff') {
                 // 能够提供原购凭证：差额×20%
                 if (originalPrice > 0) {
@@ -753,13 +797,13 @@
                         incomeCalcMethod = '无增值，差额为0';
                     }
                 } else {
-                    incomeTax = price * 10000 * 0.01;
-                    incomeCalcMethod = '原购价格未填写，按全额1%核定征收';
+                    incomeTax = price * 10000 * 0.02;
+                    incomeCalcMethod = '原购价格未填写，按核定价格×2%征收';
                 }
             } else {
-                // 不能提供凭证：总额×1%核定征收
-                incomeTax = price * 10000 * 0.01;
-                incomeCalcMethod = '按核定价格（' + (price * 10000).toFixed(2) + '元）×1%计算';
+                // 不能提供凭证：普通住宅按总额×2%核定征收
+                incomeTax = price * 10000 * 0.02;
+                incomeCalcMethod = '按核定价格（' + (price * 10000).toFixed(2) + '元）×2%计算';
             }
 
             const sellerTotal = valueTax + incomeTax;
