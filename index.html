@@ -565,14 +565,6 @@
                             💡 如不清楚可查看当时契税计税交易额
                         </div>
                     </div>
-
-                    <div class="form-group" id="originalTaxGroup" style="display: none;">
-                        <label for="originalTax">原购房已缴契税（万元）</label>
-                        <input type="number" id="originalTax" name="originalTax" placeholder="用于核定原购价格" min="0" step="0.01">
-                        <div class="info-box">
-                            💡 如不清楚可查看当时契税完税凭证
-                        </div>
-                    </div>
                 </div>
 
                 <button type="button" class="btn-calculate" onclick="calculateTax()">计算税费</button>
@@ -670,14 +662,11 @@
         function toggleIncomeCalc() {
             const incomeCalc = document.querySelector('input[name="incomeCalc"]:checked').value;
             const originalPriceGroup = document.getElementById('originalPriceGroup');
-            const originalTaxGroup = document.getElementById('originalTaxGroup');
             
             if (incomeCalc === 'diff') {
                 originalPriceGroup.style.display = 'block';
-                originalTaxGroup.style.display = 'none';
             } else {
                 originalPriceGroup.style.display = 'none';
-                originalTaxGroup.style.display = 'block';
             }
         }
 
@@ -733,7 +722,6 @@
             const unique = document.querySelector('input[name="unique"]:checked').value;
             const incomeCalc = document.querySelector('input[name="incomeCalc"]:checked').value;
             const originalPrice = parseFloat(document.getElementById('originalPrice').value) || 0;
-            const originalTax = parseFloat(document.getElementById('originalTax').value) || 0;
 
             let valueTax = 0;
             let incomeTax = 0;
@@ -755,13 +743,18 @@
                 sellerExemption += price * 10000 * 0.01; // 满5年唯一住房免征个税
             } else if (incomeCalc === 'diff') {
                 // 能够提供原购凭证：差额×20%
-                const diff = (price - originalPrice) * 10000;
-                if (diff > 0) {
-                    incomeTax = diff * 0.2;
-                    incomeCalcMethod = '按差额（' + diff.toFixed(2) + '元）×20%计算';
+                if (originalPrice > 0) {
+                    const diff = (price - originalPrice) * 10000;
+                    if (diff > 0) {
+                        incomeTax = diff * 0.2;
+                        incomeCalcMethod = '按差额（' + diff.toFixed(2) + '元）×20%计算';
+                    } else {
+                        incomeTax = 0;
+                        incomeCalcMethod = '无增值，差额为0';
+                    }
                 } else {
-                    incomeTax = 0;
-                    incomeCalcMethod = '无增值，差额为0';
+                    incomeTax = price * 10000 * 0.01;
+                    incomeCalcMethod = '原购价格未填写，按全额1%核定征收';
                 }
             } else {
                 // 不能提供凭证：总额×1%核定征收
