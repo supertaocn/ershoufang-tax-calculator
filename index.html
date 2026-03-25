@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贵州二手房交易税收测算</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        @media (min-width: 600px) {
+            .container {
+                max-width: 600px;
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 15px;
+        }
+
+        @media (min-width: 600px) {
+            .content {
+                padding: 20px;
+            }
+        }
+
+        .section {
+            margin-bottom: 18px;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        @media (min-width: 600px) {
+            .section {
+                margin-bottom: 25px;
+                padding: 15px;
+            }
+        }
+
+        .section.common {
+            background: #f0f7ff;
+            border-left-color: #667eea;
+        }
+
+        .section.buyer {
+            background: #e3f2fd;
+            border-left-color: #2196F3;
+        }
+
+        .section.seller {
+            background: #fff3e0;
+            border-left-color: #FF9800;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @media (min-width: 600px) {
+            .section-title {
+                font-size: 15px;
+                margin-bottom: 15px;
+            }
+        }
+
+        .section.buyer .section-title {
+            color: #1565c0;
+        }
+
+        .section.seller .section-title {
+            color: #e65100;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        @media (min-width: 600px) {
+            .form-group {
+                margin-bottom: 15px;
+            }
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        @media (min-width: 600px) {
+            .form-group label {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        @media (min-width: 600px) {
+            .form-group input,
+            .form-group select {
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        @media (min-width: 600px) {
+            .radio-group {
+                gap: 15px;
+            }
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .radio-item input[type="radio"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .radio-item label {
+            margin: 0;
+            font-weight: normal;
+            font-size: 13px;
+        }
+
+        @media (min-width: 600px) {
+            .radio-item label {
+                font-size: 14px;
+            }
+        }
+
+        .btn-calculate {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-calculate:active {
+            transform: scale(0.98);
+        }
+
+        .btn-calculate:hover {
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .result-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .party-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .party-section.buyer {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+        }
+
+        .party-section.seller {
+            background: #fff3e0;
+            border-left: 4px solid #FF9800;
+        }
+
+        .party-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .party-section.buyer .party-title {
+            color: #1565c0;
+        }
+
+        .party-section.seller .party-title {
+            color: #e65100;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            font-size: 13px;
+        }
+
+        @media (min-width: 600px) {
+            .result-item {
+                padding: 10px 0;
+                font-size: 14px;
+            }
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-item .label {
+            color: #666;
+        }
+
+        .result-item .value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .result-item.exemption {
+            background: #c8e6c9;
+            padding: 10px;
+            margin: 0 -10px;
+            border-radius: 4px;
+            font-size: 13px;
+            border-bottom: none !important;
+        }
+
+        .result-item.exemption .label {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .result-item.exemption .value {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .result-item.subtotal {
+            background: #f9f9f9;
+            padding: 10px;
+            margin: 0 -10px;
+            border-radius: 4px;
+            font-size: 14px;
+            border-bottom: none !important;
+        }
+
+        .result-item.subtotal .label {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .result-item.subtotal .value {
+            color: #e74c3c;
+            font-size: 15px;
+        }
+
+        @media (min-width: 600px) {
+            .result-item.subtotal .value {
+                font-size: 16px;
+            }
+        }
+
+        .result-item.burden-rate {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 10px;
+            margin: 0 -10px;
+            border-radius: 4px;
+            font-size: 12px;
+            border-bottom: none !important;
+        }
+
+        @media (min-width: 600px) {
+            .result-item.burden-rate {
+                font-size: 13px;
+            }
+        }
+
+        .result-item.burden-rate .label {
+            color: #555;
+        }
+
+        .result-item.burden-rate .value {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .result-item.total {
+            background: #fff3cd;
+            padding: 10px;
+            margin: 15px -12px 0 -12px;
+            border-radius: 6px;
+            font-size: 15px;
+            border-bottom: none !important;
+        }
+
+        @media (min-width: 600px) {
+            .result-item.total {
+                padding: 12px;
+                font-size: 16px;
+            }
+        }
+
+        .result-item.total .label {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .result-item.total .value {
+            color: #e74c3c;
+            font-size: 17px;
+        }
+
+        @media (min-width: 600px) {
+            .result-item.total .value {
+                font-size: 18px;
+            }
+        }
+
+        .tips {
+            background: #f0f7ff;
+            border-left: 4px solid #667eea;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        @media (min-width: 600px) {
+            .tips {
+                padding: 12px;
+                font-size: 12px;
+                line-height: 1.6;
+            }
+        }
+
+        .tips strong {
+            color: #333;
+        }
+
+        .error {
+            background: #fee;
+            border-left: 4px solid #e74c3c;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #c0392b;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .info-box {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 二手房交易税收测算</h1>
+            <p>贵州省 2025年政策 | 买卖双方完整计算</p>
+        </div>
+
+        <div class="content">
+            <form id="taxForm">
+                <!-- 基础信息 -->
+                <div class="section common">
+                    <div class="section-title">📋 基础信息</div>
+                    
+                    <div class="form-group">
+                        <label for="price">房屋成交价格（万元）</label>
+                        <input type="number" id="price" name="price" placeholder="例如：150" min="0" step="0.1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="area">房屋建筑面积（㎡）</label>
+                        <input type="number" id="area" name="area" placeholder="例如：120" min="0" step="0.1" required>
+                    </div>
+                </div>
+
+                <!-- 买方信息 -->
+                <div class="section buyer">
+                    <div class="section-title">👤 买方信息</div>
+                    
+                    <div class="form-group">
+                        <label>购房套数</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="first" name="houseCount" value="first" checked>
+                                <label for="first">首套</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="second" name="houseCount" value="second">
+                                <label for="second">二套</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="third" name="houseCount" value="third">
+                                <label for="third">三套+</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="buyerHouseType">房屋类型</label>
+                        <select id="buyerHouseType" name="buyerHouseType">
+                            <option value="residential">普通住宅</option>
+                            <option value="commercial">商业房</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 卖方信息 -->
+                <div class="section seller">
+                    <div class="section-title">👤 卖方信息</div>
+                    
+                    <div class="form-group">
+                        <label>房屋产权年限</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="under2" name="ownership" value="under2" checked>
+                                <label for="under2">未满2年</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="2to5" name="ownership" value="2to5">
+                                <label for="2to5">2-5年</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="over5" name="ownership" value="over5">
+                                <label for="over5">满5年+</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>是否唯一住房</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="unique" name="unique" value="yes" checked>
+                                <label for="unique">是</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="notUnique" name="unique" value="no">
+                                <label for="notUnique">否</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="originalPrice">原购房价格（万元）</label>
+                        <input type="number" id="originalPrice" name="originalPrice" placeholder="用于计算差额所得税" min="0" step="0.1">
+                        <div class="info-box">
+                            💡 如不清楚可查看当时契税计税交易额
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-calculate" onclick="calculateTax()">计算税费</button>
+            </form>
+
+            <div class="error" id="errorMsg"></div>
+
+            <!-- 结果展示 -->
+            <div class="result-section" id="resultSection">
+                <div class="result-title">💰 完整税费明细</div>
+
+                <!-- 买方结果 -->
+                <div class="party-section buyer">
+                    <div class="party-title">👤 买方税费</div>
+                    <div class="result-item">
+                        <span class="label">契税</span>
+                        <span class="value" id="contractTax">¥0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">印花税</span>
+                        <span class="value" id="stampTax">¥0</span>
+                    </div>
+                    <div class="result-item exemption">
+                        <span class="label">✓ 减免税额</span>
+                        <span class="value" id="buyerExemption">¥0</span>
+                    </div>
+                    <div class="result-item subtotal">
+                        <span class="label">买方小计</span>
+                        <span class="value" id="buyerSubtotal">¥0</span>
+                    </div>
+                    <div class="result-item burden-rate">
+                        <span class="label">买方负担率</span>
+                        <span class="value" id="buyerBurdenRate">0.00%</span>
+                    </div>
+                </div>
+
+                <!-- 卖方结果 -->
+                <div class="party-section seller">
+                    <div class="party-title">👤 卖方税费</div>
+                    <div class="result-item">
+                        <span class="label">增值税及附加</span>
+                        <span class="value" id="valueTax">¥0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">个人所得税</span>
+                        <span class="value" id="incomeTax">¥0</span>
+                    </div>
+                    <div class="result-item exemption">
+                        <span class="label">✓ 减免税额</span>
+                        <span class="value" id="sellerExemption">¥0</span>
+                    </div>
+                    <div class="result-item subtotal">
+                        <span class="label">卖方小计</span>
+                        <span class="value" id="sellerSubtotal">¥0</span>
+                    </div>
+                    <div class="result-item burden-rate">
+                        <span class="label">卖方负担率</span>
+                        <span class="value" id="sellerBurdenRate">0.00%</span>
+                    </div>
+                </div>
+
+                <!-- 合计 -->
+                <div class="result-item total">
+                    <span class="label">双方合计税费</span>
+                    <span class="value" id="totalTax">¥0</span>
+                </div>
+
+                <div class="result-item total" style="background: #e8f5e9; margin-top: 5px;">
+                    <span class="label">总体负担率</span>
+                    <span class="value" style="color: #2e7d32;" id="totalBurdenRate">0.00%</span>
+                </div>
+
+                <div class="tips">
+                    <strong>📌 重要提示：</strong><br>
+                    • 本计算器仅供参考，具体税费以税务部门核定为准<br>
+                    • 不同地区可能有差异，建议咨询专业税务顾问<br>
+                    • 中介费、评估费等其他费用未包含在内<br>
+                    • 政策如有调整，以最新规定为准<br>
+                    • 负担率 = 税费 ÷ 成交价格 × 100%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatCurrency(value) {
+            return '¥' + value.toFixed(2);
+        }
+
+        function calculateTax() {
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.classList.remove('show');
+
+            const price = parseFloat(document.getElementById('price').value);
+            const area = parseFloat(document.getElementById('area').value);
+
+            if (!price || price <= 0 || !area || area <= 0) {
+                errorMsg.textContent = '❌ 请输入有效的价格和面积';
+                errorMsg.classList.add('show');
+                return;
+            }
+
+            // 买方税费
+            const houseCount = document.querySelector('input[name="houseCount"]:checked').value;
+            const buyerHouseType = document.getElementById('buyerHouseType').value;
+
+            let contractTaxRate = 0;
+            if (buyerHouseType === 'residential') {
+                if (houseCount === 'first') {
+                    contractTaxRate = area <= 90 ? 0.01 : (area <= 140 ? 0.015 : 0.02);
+                } else if (houseCount === 'second') {
+                    contractTaxRate = area <= 140 ? 0.01 : 0.02;
+                } else {
+                    contractTaxRate = 0.03;
+                }
+            } else {
+                contractTaxRate = 0.03;
+            }
+
+            const contractTax = price * 10000 * contractTaxRate;
+            const stampTax = 0;
+            
+            // 买方减免税额（印花税暂免）
+            const buyerExemption = stampTax;
+            const buyerTotal = contractTax + stampTax;
+
+            // 卖方税费
+            const ownership = document.querySelector('input[name="ownership"]:checked').value;
+            const unique = document.querySelector('input[name="unique"]:checked').value;
+            const originalPrice = parseFloat(document.getElementById('originalPrice').value) || 0;
+
+            let valueTax = 0;
+            let incomeTax = 0;
+            let sellerExemption = 0;
+
+            // 增值税及附加（5.3%或免征）
+            if (ownership === 'under2') {
+                valueTax = price * 10000 * 0.053;
+            } else {
+                valueTax = 0;
+                sellerExemption += price * 10000 * 0.053; // 满2年免征增值税
+            }
+
+            // 个人所得税
+            if (ownership === 'over5' && unique === 'yes') {
+                incomeTax = 0;
+                sellerExemption += price * 10000 * 0.01; // 满5年唯一住房免征个税
+            } else if (ownership === 'over5' && unique === 'no') {
+                const diff = (price - originalPrice) * 10000;
+                incomeTax = diff > 0 ? diff * 0.2 : 0;
+            } else {
+                const fullAmount = price * 10000 * 0.01;
+                const diffAmount = originalPrice > 0 ? Math.max((price - originalPrice) * 10000 * 0.2, 0) : fullAmount;
+                incomeTax = Math.min(fullAmount, diffAmount);
+            }
+
+            const sellerTotal = valueTax + incomeTax;
+
+            // 计算负担率
+            const totalPrice = price * 10000;
+            const buyerBurdenRate = (buyerTotal / totalPrice) * 100;
+            const sellerBurdenRate = (sellerTotal / totalPrice) * 100;
+            const totalTax = buyerTotal + sellerTotal;
+            const totalBurdenRate = (totalTax / totalPrice) * 100;
+
+            // 显示结果
+            document.getElementById('contractTax').textContent = formatCurrency(contractTax);
+            document.getElementById('stampTax').textContent = formatCurrency(stampTax);
+            document.getElementById('buyerExemption').textContent = formatCurrency(buyerExemption);
+            document.getElementById('buyerSubtotal').textContent = formatCurrency(buyerTotal);
+            document.getElementById('buyerBurdenRate').textContent = buyerBurdenRate.toFixed(2) + '%';
+
+            document.getElementById('valueTax').textContent = formatCurrency(valueTax);
+            document.getElementById('incomeTax').textContent = formatCurrency(incomeTax);
+            document.getElementById('sellerExemption').textContent = formatCurrency(sellerExemption);
+            document.getElementById('sellerSubtotal').textContent = formatCurrency(sellerTotal);
+            document.getElementById('sellerBurdenRate').textContent = sellerBurdenRate.toFixed(2) + '%';
+
+            document.getElementById('totalTax').textContent = formatCurrency(totalTax);
+            document.getElementById('totalBurdenRate').textContent = totalBurdenRate.toFixed(2) + '%';
+
+            const resultSection = document.getElementById('resultSection');
+            resultSection.classList.add('show');
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // 回车键计算
+        document.getElementById('taxForm').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                calculateTax();
+            }
+        });
+    </script>
+</body>
+</html>
