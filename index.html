@@ -656,8 +656,9 @@
 
             let contractTaxRate = 0;
             if (buyerHouseType === 'residential') {
+                // 2025年最新政策：首套≤140㎡按1%，>140㎡按1.5%
                 if (houseCount === 'first') {
-                    contractTaxRate = area <= 90 ? 0.01 : (area <= 140 ? 0.015 : 0.02);
+                    contractTaxRate = area <= 140 ? 0.01 : 0.015;
                 } else if (houseCount === 'second') {
                     contractTaxRate = area <= 140 ? 0.01 : 0.02;
                 } else {
